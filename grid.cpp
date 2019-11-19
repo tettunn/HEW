@@ -43,8 +43,7 @@ void Grid_UnInit()
 
 void Grid_Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice=NULL;
-	pDevice = MyDirect3D_GetDevice();
+	LPDIRECT3DDEVICE9 pDevice= MyDirect3D_GetDevice();
 
 	pDevice->SetRenderState(D3DRS_LIGHTING, false);
 
@@ -52,6 +51,7 @@ void Grid_Draw()
 	D3DXMatrixIdentity(&mtxW);
 	pDevice->SetTransform(D3DTS_WORLD, &mtxW);
 	pDevice->SetFVF(FVF_GRID);
+	pDevice->SetTexture(0, NULL);
 	pDevice->DrawPrimitiveUP(D3DPT_LINELIST, GRID_PRIMITIVE, &g_Grid_Vertex, sizeof(GridVertex));
 
 	pDevice->SetRenderState(D3DRS_LIGHTING, true);
