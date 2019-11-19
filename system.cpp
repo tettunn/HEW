@@ -9,9 +9,6 @@ void System_Init()
 	Texture_Init();
 	Model_Init();
 	Grid_Init();
-
-	Model_Load();
-	Texture_Load();
 }
 
 void System_UnInit()
