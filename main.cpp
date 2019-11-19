@@ -24,6 +24,8 @@
 #include"mouse_input.h"
 #include"joycon.h"
 #include"game.h"
+#include"model.h"
+#include"texture.h"
 
 /*----------------------------
 	’è”,ƒ}ƒNƒ’è‹`
@@ -220,6 +222,9 @@ bool Init(HWND hWnd) {
 	InitSound(hWnd);
 	
 	Camera_Init();
+
+	Model_Load();
+	Texture_Load();
 
 	return true;
 }
