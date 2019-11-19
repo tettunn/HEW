@@ -3,6 +3,7 @@
 #include"model.h"
 #include"sound.h"
 #include"mic.h"
+#include"light.h"
 
 void System_Init()
 {

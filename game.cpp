@@ -1,6 +1,7 @@
 #include<d3dx9.h>
 #include"cube.h"
 #include"model.h"
+#include"mydirect3d.h"
 
 static int cart;
 

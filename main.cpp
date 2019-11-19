@@ -26,6 +26,7 @@
 #include"game.h"
 #include"model.h"
 #include"texture.h"
+#include"grid.h"
 
 /*----------------------------
 	’è”,ƒ}ƒNƒ’è‹`
@@ -223,6 +224,8 @@ bool Init(HWND hWnd) {
 	
 	Camera_Init();
 
+	Grid_Init();
+
 	Model_Load();
 	Texture_Load();
 
@@ -274,10 +277,10 @@ void Draw(void) {
 	g_pDevice->BeginScene();
 
 	Light_Draw();
+	Grid_Draw();
 	
 	System_Draw();
 	Game_Draw();
-
 
 	debug_logDraw();
 	DebugFont_Draw(1, 1, "%.2f", g_FPS);
