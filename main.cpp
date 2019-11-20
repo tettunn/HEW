@@ -24,6 +24,9 @@
 #include"mouse_input.h"
 #include"joycon.h"
 #include"game.h"
+#include"model.h"
+#include"texture.h"
+#include"grid.h"
 
 /*----------------------------
 	定数,マクロ定義
@@ -129,7 +132,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	if (!Joycon_Initialize(hInstance, hWnd)) {
 		MessageBox(NULL, "ジョイコンが初期化できませんでした", "エラー", MB_OK);
-		return 0;
 	}
 
 	if (!Init(hWnd)) {
@@ -218,8 +220,12 @@ bool Init(HWND hWnd) {
 	System_Init();
 	Game_Init();
 	InitSound(hWnd);
-	
 	Camera_Init();
+
+	Grid_Init();
+
+	Model_Load();
+	Texture_Load();
 
 	return true;
 }
@@ -231,7 +237,6 @@ void Uninit(void) {
 	Keyboard_Finalize();
 	Joycon_Finalize();
 	Mouse_Finalize();
-
 	System_UnInit();
 	Game_UnInit();
 
@@ -244,7 +249,6 @@ void Update(void) {
 	Keyboard_Update();
 	Joycon_Update();
 	Mouse_Update();
-
 	System_Update();
 	Game_Update();
 
@@ -269,10 +273,10 @@ void Draw(void) {
 	g_pDevice->BeginScene();
 
 	Light_Draw();
+	Grid_Draw();
 	
 	System_Draw();
 	Game_Draw();
-
 
 	debug_logDraw();
 	DebugFont_Draw(1, 1, "%.2f", g_FPS);
