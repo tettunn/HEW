@@ -132,7 +132,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	if (!Joycon_Initialize(hInstance, hWnd)) {
 		MessageBox(NULL, "ジョイコンが初期化できませんでした", "エラー", MB_OK);
-		return 0;
 	}
 
 	if (!Init(hWnd)) {
@@ -221,7 +220,6 @@ bool Init(HWND hWnd) {
 	System_Init();
 	Game_Init();
 	InitSound(hWnd);
-	
 	Camera_Init();
 
 	Grid_Init();
@@ -239,7 +237,6 @@ void Uninit(void) {
 	Keyboard_Finalize();
 	Joycon_Finalize();
 	Mouse_Finalize();
-
 	System_UnInit();
 	Game_UnInit();
 
@@ -252,7 +249,6 @@ void Update(void) {
 	Keyboard_Update();
 	Joycon_Update();
 	Mouse_Update();
-
 	System_Update();
 	Game_Update();
 

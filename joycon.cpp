@@ -91,58 +91,58 @@ bool Joycon_Initialize(HINSTANCE hInstance, HWND hWnd)
 		return false;
 	}
 	c = 0;
-	g_pJoyconInput->EnumDevices(DI8DEVCLASS_GAMECTRL, (LPDIENUMDEVICESCALLBACK)EnumJoyDeviceCallBack, NULL, DIEDFL_ATTACHEDONLY);
+	HRESULT hr = g_pJoyconInput->EnumDevices(DI8DEVCLASS_GAMECTRL, (LPDIENUMDEVICESCALLBACK)EnumJoyDeviceCallBack, NULL, DIEDFL_ATTACHEDONLY);
+	if (SUCCEEDED(hr)) {
+		//データフォーマットを設定
+		if (FAILED(hr))		return false; // データフォーマットの設定に失敗
 
-	//データフォーマットを設定
-	HRESULT hr = g_pDevJoycon->SetDataFormat(&c_dfDIJoystick);	// ジョイコン用のデータ・フォーマットを設定
-	if (FAILED(hr))		return false; // データフォーマットの設定に失敗
+		//モードを設定（フォアグラウンド＆非排他モード）
+		hr = g_pDevJoycon->SetCooperativeLevel(hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+		if (FAILED(hr))		return false; // モードの設定に失敗
 
-	//モードを設定（フォアグラウンド＆非排他モード）
-	hr = g_pDevJoycon->SetCooperativeLevel(hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-	if (FAILED(hr))		return false; // モードの設定に失敗
+		//軸の値の範囲を設定
+			//X軸、Y軸のそれぞれについて、オブジェクトが報告可能な値の範囲をセットする。
+			//(max-min)は、最大10,000(?)。(max-min)/2が中央値になる。
+			//差を大きくすれば、アナログ値の細かな動きを捕らえられる。(パッドは、関係なし)
+		DIPROPRANGE diprg;
+		ZeroMemory(&diprg, sizeof(diprg));
+		diprg.diph.dwSize = sizeof(diprg);
+		diprg.diph.dwHeaderSize = sizeof(diprg.diph);
+		diprg.diph.dwHow = DIPH_BYOFFSET;
+		diprg.lMin = RANGE_MIN;
+		diprg.lMax = RANGE_MAX;
+		//X軸の範囲を設定
+		diprg.diph.dwObj = DIJOFS_X;
+		hr = g_pDevJoycon->SetProperty(DIPROP_RANGE, &diprg.diph);
+		if (FAILED(hr))		return FALSE;
+		//Y軸の範囲を設定
+		diprg.diph.dwObj = DIJOFS_Y;
+		hr = g_pDevJoycon->SetProperty(DIPROP_RANGE, &diprg.diph);
+		if (FAILED(hr))		return FALSE;
 
-	//軸の値の範囲を設定
-		//X軸、Y軸のそれぞれについて、オブジェクトが報告可能な値の範囲をセットする。
-		//(max-min)は、最大10,000(?)。(max-min)/2が中央値になる。
-		//差を大きくすれば、アナログ値の細かな動きを捕らえられる。(パッドは、関係なし)
-	DIPROPRANGE diprg;
-	ZeroMemory(&diprg, sizeof(diprg));
-	diprg.diph.dwSize = sizeof(diprg);
-	diprg.diph.dwHeaderSize = sizeof(diprg.diph);
-	diprg.diph.dwHow = DIPH_BYOFFSET;
-	diprg.lMin = RANGE_MIN;
-	diprg.lMax = RANGE_MAX;
-	//X軸の範囲を設定
-	diprg.diph.dwObj = DIJOFS_X;
-	hr = g_pDevJoycon->SetProperty(DIPROP_RANGE, &diprg.diph);
-	if (FAILED(hr))		return FALSE;
-	//Y軸の範囲を設定
-	diprg.diph.dwObj = DIJOFS_Y;
-	hr = g_pDevJoycon->SetProperty(DIPROP_RANGE, &diprg.diph);
-	if (FAILED(hr))		return FALSE;
+		// 各軸ごとに、無効のゾーン値を設定する。
+		// 無効ゾーンとは、中央からの微少なジョイスティックの動きを無視する範囲のこと。
+		// 指定する値は、10000に対する相対値(2000なら20パーセント)。
+		DIPROPDWORD				dipdw;
+		dipdw.diph.dwSize = sizeof(DIPROPDWORD);
+		dipdw.diph.dwHeaderSize = sizeof(dipdw.diph);
+		dipdw.diph.dwHow = DIPH_BYOFFSET;
+		dipdw.dwData = DEADZONE;
+		//X軸の無効ゾーンを設定
+		dipdw.diph.dwObj = DIJOFS_X;
+		hr = g_pDevJoycon->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
+		if (FAILED(hr))		return FALSE;
+		//Y軸の無効ゾーンを設定
+		dipdw.diph.dwObj = DIJOFS_Y;
+		hr = g_pDevJoycon->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
+		if (FAILED(hr))		return FALSE;
 
-	// 各軸ごとに、無効のゾーン値を設定する。
-	// 無効ゾーンとは、中央からの微少なジョイスティックの動きを無視する範囲のこと。
-	// 指定する値は、10000に対する相対値(2000なら20パーセント)。
-	DIPROPDWORD				dipdw;
-	dipdw.diph.dwSize = sizeof(DIPROPDWORD);
-	dipdw.diph.dwHeaderSize = sizeof(dipdw.diph);
-	dipdw.diph.dwHow = DIPH_BYOFFSET;
-	dipdw.dwData = DEADZONE;
-	//X軸の無効ゾーンを設定
-	dipdw.diph.dwObj = DIJOFS_X;
-	hr = g_pDevJoycon->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
-	if (FAILED(hr))		return FALSE;
-	//Y軸の無効ゾーンを設定
-	dipdw.diph.dwObj = DIJOFS_Y;
-	hr = g_pDevJoycon->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
-	if (FAILED(hr))		return FALSE;
-
-	hr = g_pDevJoycon->Poll();
-	if (FAILED(hr)) {
-		hr = g_pDevJoycon->Acquire();
-		while (hr == DIERR_INPUTLOST) {
+		hr = g_pDevJoycon->Poll();
+		if (FAILED(hr)) {
 			hr = g_pDevJoycon->Acquire();
+			while (hr == DIERR_INPUTLOST) {
+				hr = g_pDevJoycon->Acquire();
+			}
 		}
 	}
 

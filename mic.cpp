@@ -48,7 +48,7 @@ static short g_data;
 
 void Mic_Update()
 {
-	g_MicBuffer->Start(DSCBSTART_LOOPING);
+	//g_MicBuffer->Start(DSCBSTART_LOOPING);
 	DWORD capturepos;
 	DWORD readpos;
 	void* pbCaptureData = NULL;
@@ -59,12 +59,12 @@ void Mic_Update()
 	g_MicBuffer->GetCurrentPosition(&capturepos, &readpos);
 
 	HRESULT hr;
-	hr = g_MicBuffer->Lock(readpos, 1, &pbCaptureData, &dwCaptureLength, &pbCaptureData2, &dwCaptureLength2, NULL);
+	hr = g_MicBuffer->Lock(capturepos, 1, &pbCaptureData, &dwCaptureLength, &pbCaptureData2, &dwCaptureLength2, NULL);
 
-	g_data = (short)pbCaptureData;
+	g_data = (BYTE)pbCaptureData;
 	DebugPrintf("%d\n", g_data);
 	g_MicBuffer->Unlock(pbCaptureData, dwCaptureLength, pbCaptureData2, dwCaptureLength2);
-
+	
 	g_fream++;
 }
 
